@@ -6,10 +6,13 @@ public class PlayerInteractionController : MonoBehaviour {
 
     InventorySystem invSystem;
     float pickUpCooldown;
+    UISystem ui_System;
+    public Sprite[] buttonImages;
 
     private void Start()
     {
         invSystem = GetComponent<InventorySystem>();
+        ui_System = Camera.main.GetComponent<UISystem>();
     }
 
     private void Update()
@@ -27,7 +30,7 @@ public class PlayerInteractionController : MonoBehaviour {
     {
         if (col.tag == "Weapon")
         {
-            Debug.Log("Press Y to pick up");
+            ui_System.playerPrompts("Press", "to pick up.", buttonImages[0]);
         }
     }
 
@@ -37,7 +40,6 @@ public class PlayerInteractionController : MonoBehaviour {
         {
             if (Input.GetButtonDown("Interact") && pickUpCooldown <= 0)
             {
-                // MatchGunToType(col.gameObject);
                 pickUpCooldown = 1f;
                 invSystem.AddGunToList(col.GetComponent<Gun>());
                 Destroy(col.gameObject);

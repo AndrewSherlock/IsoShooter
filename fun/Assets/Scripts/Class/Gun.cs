@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class Gun : MonoBehaviour {
 
     public string gunName;
+    public Sprite gunImage;
 
     public int reloadTime;
     public float damagePerHit;
@@ -18,7 +20,7 @@ public abstract class Gun : MonoBehaviour {
     public gunType typeOfGun;
 
     public abstract IEnumerator ReloadGun(); // anoother that maybe implemented in this class
-    public abstract void ShootGun();
+    public abstract void ShootGun(Quaternion currentAim);
     public abstract void CoolDownTimePerShot(); // maybe implemented in this class. im not to sure
 
     public enum gunType{

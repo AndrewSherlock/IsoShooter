@@ -9,7 +9,6 @@ public class InventorySystem : MonoBehaviour {
 
     public void Update()
     {
-        Debug.Log("Gun Count : " + gunList.Count);
         if (Input.GetKeyDown(KeyCode.Space))
         {
             foreach (Gun g in gunList)

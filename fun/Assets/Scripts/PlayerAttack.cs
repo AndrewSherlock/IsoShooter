@@ -12,13 +12,15 @@ public class PlayerAttack : MonoBehaviour {
     public GameObject currentGun; // test
     int currentChoice;
 
-    public Gun g; 
+    public Gun gunEntity;
+    UISystem ui_System;
 	
     
     // Use this for initialization
 	void Start () {
         invSystem = GetComponentInParent<InventorySystem>();
         currentChoice = 0;
+        ui_System = Camera.main.GetComponent<UISystem>();
 	}
 	
 	// Update is called once per frame
@@ -27,24 +29,27 @@ public class PlayerAttack : MonoBehaviour {
         if (Input.GetButtonDown("Cycle") && invSystem.gunList.Count != 0)
             ChooseGun();
 
-        if (g != null)
-            g.ShootGun();
-
-        if (g != null)
-        {
-            gunInfo[0].text = "Name : " + g.gunName;
-            gunInfo[1].text = "Ammo : " + g.currentAmmo + "/" + g.maxAmmo;
-            gunInfo[2].text = "Left in Magazine : " + g.numberOfBulletsInChamber;
-        }
+        if (gunEntity != null)
+            gunEntity.ShootGun(Quaternion.Euler(0,0,0));
 
         if (Input.GetButtonDown("ThrowObject") && currentGun != null)
         {
             ThrowObject(currentGun);
-            g = null;
+            gunEntity = null;
             currentGun = null;
         }
 
-
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.rotation * Vector3.forward * 20f, out hit))
+        {
+            //ui_System.DrawTargetOnObject(hit.transform.position);
+            if (hit.collider.tag == "Enemy")
+            {
+                Debug.DrawRay(transform.position, transform.rotation * Vector3.forward * 20f, Color.red);
+                ui_System.DrawTargetOnObject(hit.transform.position);
+            }             
+        }
+        
     }
 
     void ShootWeapon()
@@ -52,27 +57,20 @@ public class PlayerAttack : MonoBehaviour {
         Debug.DrawRay(transform.position, transform.rotation * Vector3.forward * 20f, Color.red);
         if (Input.GetAxisRaw("FireButton") == 1)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.rotation * Vector3.forward * 20f, out hit))
-            { 
-                if (hit.collider)
-                {
-                    Debug.Log(hit.collider.name);
-                }
-            }
+            gunEntity.ShootGun(Quaternion.Euler(transform.rotation * Vector3.forward * 20f));
         }
     }
 
     void ChooseGun()
     {
 
-        if (currentGun != null && g.currentAmmo > 0)
+        if (currentGun != null && gunEntity.currentAmmo > 0)
         {
             Debug.Log("here");
-            invSystem.AddGunToList(g);
+            invSystem.AddGunToList(gunEntity);
             Destroy(currentGun);
         }
-        else if (currentGun != null && g.currentAmmo <= 0) {
+        else if (currentGun != null && gunEntity.currentAmmo <= 0) {
             currentGun.transform.parent = null;
             currentGun.AddComponent<Rigidbody>().AddForce(-Vector3.up * 2f, ForceMode.Impulse);
             currentGun.AddComponent<BoxCollider>();
@@ -97,10 +95,10 @@ public class PlayerAttack : MonoBehaviour {
     {
         if (currentGun.GetComponent<Pistol>() != null)
         {
-            g = currentGun.GetComponent<Pistol>();
+            gunEntity = currentGun.GetComponent<Pistol>();
         } else if (currentGun.GetComponent<ShotGun>() != null)
         {
-            g = currentGun.GetComponent<ShotGun>();
+            gunEntity = currentGun.GetComponent<ShotGun>();
         }
     }
 
